@@ -1,0 +1,29 @@
+version: "3.9"
+
+
+services:
+
+  nginx:
+      image: nginx
+      container_name: nginx
+      volumes:
+        - ./nginx/config:/etc/nginx/templates/
+        - ./nginx/logs:/var/log/nginx/
+        - ./static:/static
+        - ./media:/media
+      ports:
+        - 80:80
+
+  tooth-ease-kids:
+    env_file:
+      - path: ./.env
+    image: ${DOCKERHUB_USERNAME}/tooth-ease-kids:latest
+    container_name: tooth-ease-kids
+    command: sh -c "python manage.py collectstatic --noinput && python manage.py migrate && python manage.py compilemessages -l 'pt_BR' && gunicorn -b 0.0.0.0:8001 toothease.wsgi:application"
+    volumes:
+      - ./static:/static
+      - ./media:/code/media
+
+  
+
+  

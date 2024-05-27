@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres
+    command: ["postgres", "-c", "log_checkpoints=off"]
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  nginx:
+      image: nginx
+      container_name: nginx
+      volumes:
+        - ./nginx:/etc/nginx/templates/
+        - ./nginx/logs:/var/log/nginx/
+        - ./static:/static
+        - ./media:/media
+      ports:
+        - 80:80
+
+  tooth-ease-kids:
+    env_file:
+      - path: .env.dev
+    build: .
+    container_name: tooth-ease-kids
+    command: sh -c "python manage.py collectstatic --noinput && python manage.py migrate && python manage.py compilemessages -l 'pt_BR' && gunicorn -b 0.0.0.0:8001 toothease.wsgi:application"
+    depends_on:
+      - db
+      - nginx
+    volumes:
+      - ./static:/static
+      - ./media:/code/media
