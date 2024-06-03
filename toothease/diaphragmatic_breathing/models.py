@@ -26,8 +26,6 @@ class TutorialDiaphragmaticBreathing(BaseModel):
     audio = models.FileField(
         upload_to="audioTutorialDiaphragmaticBreathing/",
         verbose_name=_("Audio"),
-        blank=True,
-        null=True,
     )
 
     class Meta:
